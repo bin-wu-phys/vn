@@ -102,3 +102,9 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+# Mac OS X
+.DS_Store
+
+# No backups
+*.*~
