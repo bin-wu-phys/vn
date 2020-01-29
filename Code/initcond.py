@@ -262,12 +262,17 @@ class InitCond:
         yMax, dy = 10.0, 0.2
         yList = [-yMax + 0.5 * dy + n * dy for n in range(int(2.0 * yMax / dy))]
         self.init_fun = interpolate.interp2d(xList, yList, density, kind='linear', fill_value=0.0)
-        print('Calculating R2 ...\n')
-        R2 = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*(x**2 + y**2), [(-9.9, 9.9), (-9.9, 9.9)])
         print('Calculating N ...\n')
         N = integrate.nquad(lambda x, y: self.init_fun(x, y)[0], [(-9.9, 9.9), (-9.9, 9.9)])
+        print('Calculating xbar, ybar ...\n')
+        self.xb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*x, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
+        self.yb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*y, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
+        print('xbar = {}, ybar = {}.'.format(self.xb, self.yb))
+        print('Calculating R2 ...\n')
+        R2 = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*((x - self.xb)**2 + (y - self.yb)**2), [(-9.9, 9.9), (-9.9, 9.9)])
         self.e0 = N[0]/np.pi
         self.R = np.sqrt(R2[0]/N[0])
+        print('R = {}.'.format(self.R))
 
     def FT_file(self, r, th):
         """
@@ -276,7 +281,8 @@ class InitCond:
         :param th: theta tilde
         :return: FT with normalizaiton FT(0)=2.0/self.t0
         """
-        return 2.0*self.R*self.R*self.init_fun(r*self.R*np.cos(th), r*self.R*np.sin(th))[0]/(self.e0*self.t0)
+        return 2.0*self.R*self.R*self.init_fun(self.xb + r*self.R*np.cos(th),
+                                               self.yb + r*self.R*np.sin(th))[0]/(self.e0*self.t0)
 
     def from_file_theta(self, latt):
         self.theta, self.vz, self.r, self.phi = latt.indices()
@@ -304,7 +310,14 @@ class InitCond:
         latt : object of class Lattice
             Grids points for the initial conditon.
         """
-        return self.fft(self.from_file_theta, latt)
+        F0 = self.fft(self.from_file_theta, latt)
+        if len(self.dn) == 1:
+            for n in range(1, len(F0)):
+                if n == self.dn[0][0]:
+                    F0[n, :, :, :] = self.dn[0][1]*F0[n, :, :, :]
+                else:
+                    F0[n, :, :, :] = 0.0*F0[n, :, :, :]
+        return F0
 
     lookup = {'gaussian': gauss, 'hocky puck': hockypuck, ' Woods-Saxo':ws, 'file':from_file}
 
@@ -317,6 +330,8 @@ class InitCond:
         self.ancientQ = False
         self.fname = None
         self.init_fun = None
+        self.xb = 0.0 # average value of x
+        self.yb = 0.0 # average value of y
         self.R = 1.0
         self.e0 = 1.0
         if ICtype in self.lookup:

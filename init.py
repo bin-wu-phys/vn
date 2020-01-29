@@ -2,7 +2,8 @@
 #!/usr/bin/env python3
 
 import sys
-sys.path.insert(0, '/afs/cern.ch/user/b/biwu/vn/version6/debug/version6')
+work_path = '/afs/cern.ch/user/b/biwu/vn/version8'
+sys.path.insert(0, work_path)
 
 if __name__ == '__main__':
 
@@ -15,7 +16,7 @@ if __name__ == '__main__':
 
     # create the directory for the results if needed
     # dirres = 'results'
-    dirres = '/afs/cern.ch/user/b/biwu/vn/version6/debug/version6'
+    dirres = work_path
 
     if dirres !='':
         if not os.path.exists(dirres):
@@ -52,7 +53,10 @@ if __name__ == '__main__':
             if aQ:
                 ic.setAncient(aQ)
         elif ictype == 'file':
-            ic = InitCond(ictype, t0)
+            if ns == 0:
+                ic = InitCond(ictype, t0)
+            else:
+                ic = InitCond(ictype, t0, (ns, dns))
             ic.setFile(dirres + fname)
         C = Kernel(g=g, ob=ob, dr=dr)
         kt = KinTran(t0, ic.initialize(latt), C, dt=dt, err=err)

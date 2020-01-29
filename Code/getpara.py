@@ -43,6 +43,7 @@ if len(sys.argv) == 2:
             "./init.py -f (file name for parameters) (line for the parameters)"
             It also takes the input file and runs like:
             "./init.py ic=file fn=file name para=value"
+            Here, one can switch on one modes ns=(some integer) and specify the amplitude dns=(some value).
             """
         )
         quit()
@@ -89,7 +90,7 @@ nv = nvd
 nph = nphd
 nth = 16
 errd = 1.0e-4
-err = 1.0e-4
+err = 1.0e-3
 
 #nth reaction plan3 angle
 psi1 = 0.0
@@ -98,6 +99,10 @@ psi3 = 0.0
 psi4 = 0.0
 psi5 = 0.0
 psi6 = 0.0
+
+#initial condition from file, switch on one mode
+ns = 0
+dns = 1.0
 
 # Read the parameters
 if len(sys.argv) == 4:
@@ -145,6 +150,10 @@ for para in argvs:
         psi5 = float(cmd[1])
     elif cmd[0] == 'p6':
         psi6 = float(cmd[1])
+    elif cmd[0] == 'ns':
+        ns = int(cmd[1])
+    elif cmd[0] == 'dns':
+        dns = float(cmd[1])
     elif cmd[0] == 'ic':
         ictype = cmd[1]
     elif cmd[0] == 'fn':
@@ -271,6 +280,8 @@ if ictype == icd:
 
 elif ictype == 'file':
     fn = 't0.{:.2f}.fn.{}.g.{:.2f}.nth.{}'.format(t0, fname[:-4], g, nth, vMax, nv)
+    if ns != 0:
+        fn = fn + '.ns.{}.dns.{:.2f}'.format(ns, dns)
     if vMax != vMaxd or nv != nvd:
         fn = fn + f'.vMax.{vMax}.nv.{nv}'
     if rMax != rMaxd or nr != nrd:
