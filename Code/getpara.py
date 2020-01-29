@@ -39,6 +39,8 @@ if len(sys.argv) == 2:
             aQ : aQ=True, False for old, new initial gaussian condition
             rMax, nr, vMax, nv, nph, nth : parameters for setting up the lattice
             procs: the number of processes for parallel computation
+            shiftQ: shiftQ=True or False to determine whether the initial profile shift its origin or not
+                    shiftQ=True by default and it is only useful for the case with ic=file.
             or
             "./init.py -f (file name for parameters) (line for the parameters)"
             It also takes the input file and runs like:
@@ -70,6 +72,7 @@ psi5d = 0.0
 psi6d = 0.0
 
 adtQ = True
+shiftQ = True
 t0 = 0.05
 dtd = 0.05
 dt = 0.05
@@ -173,6 +176,14 @@ for para in argvs:
             adtQ = False
         else:
             print("adtQ can only be True or False.")
+            exit()
+    elif cmd[0] == 'shiftQ':
+        if cmd[1] == 'True':
+            shiftQ = True
+        elif cmd[1] == 'False':
+            shiftQ = False
+        else:
+            print("shiftQ can only be True or False.")
             exit()
     elif cmd[0] == 't0':
         t0 = float(cmd[1])
@@ -289,5 +300,9 @@ elif ictype == 'file':
 
     if nph != nphd:
         fn = fn + f'.nph.{nph}'
+    if shiftQ:
+        fn = fn + '.shifted'
+    else:
+        fn = fn + '.unshifted'
 
 print(fn)

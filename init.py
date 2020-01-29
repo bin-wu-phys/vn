@@ -58,6 +58,7 @@ if __name__ == '__main__':
             else:
                 ic = InitCond(ictype, t0, (ns, dns))
             ic.setFile(dirres + fname)
+            ic.set_shiftQ(shiftQ)
         C = Kernel(g=g, ob=ob, dr=dr)
         kt = KinTran(t0, ic.initialize(latt), C, dt=dt, err=err)
         if procs > 1:

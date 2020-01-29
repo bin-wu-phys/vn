@@ -253,6 +253,13 @@ class InitCond:
     def ws(self, latt):
         pass
 
+    def set_shiftQ(self, s):
+        """
+        set the value of shiftQ
+        :param s: a bool
+        """
+        self.shiftQ = s
+
     def read(self):
         f = open(self.fname)
         data = [l.replace('\n', '').split(' ') for l in f if ('#' not in l) and (l != '')]
@@ -262,17 +269,18 @@ class InitCond:
         yMax, dy = 10.0, 0.2
         yList = [-yMax + 0.5 * dy + n * dy for n in range(int(2.0 * yMax / dy))]
         self.init_fun = interpolate.interp2d(xList, yList, density, kind='linear', fill_value=0.0)
-        print('Calculating N ...\n')
+        #print('Calculating N ...\n')
         N = integrate.nquad(lambda x, y: self.init_fun(x, y)[0], [(-9.9, 9.9), (-9.9, 9.9)])
-        print('Calculating xbar, ybar ...\n')
-        self.xb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*x, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
-        self.yb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*y, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
-        print('xbar = {}, ybar = {}.'.format(self.xb, self.yb))
-        print('Calculating R2 ...\n')
+        if self.shiftQ:
+            #print('Calculating xbar, ybar ...\n')
+            self.xb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*x, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
+            self.yb = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*y, [(-9.9, 9.9), (-9.9, 9.9)])[0]/N[0]
+            #print('xbar = {}, ybar = {}.'.format(self.xb, self.yb))
+        #print('Calculating R2 ...\n')
         R2 = integrate.nquad(lambda x, y: self.init_fun(x, y)[0]*((x - self.xb)**2 + (y - self.yb)**2), [(-9.9, 9.9), (-9.9, 9.9)])
         self.e0 = N[0]/np.pi
         self.R = np.sqrt(R2[0]/N[0])
-        print('R = {}.'.format(self.R))
+        #print('R = {}.'.format(self.R))
 
     def FT_file(self, r, th):
         """
@@ -330,10 +338,14 @@ class InitCond:
         self.ancientQ = False
         self.fname = None
         self.init_fun = None
+
+        #parameters for input initial profile
         self.xb = 0.0 # average value of x
         self.yb = 0.0 # average value of y
-        self.R = 1.0
-        self.e0 = 1.0
+        self.R = 1.0 # the root mean square radius
+        self.shiftQ = True # whether shif the origin or not
+        self.e0 = 1.0 # variable used for normalization
+
         if ICtype in self.lookup:
             self.ICtype = ICtype
             self.t0 = t0

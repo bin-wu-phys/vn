@@ -108,3 +108,6 @@ venv.bak/
 
 # No backups
 *.*~
+
+# tmp file for the message of the next commit
+*.tmp
