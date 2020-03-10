@@ -111,3 +111,7 @@ venv.bak/
 
 # tmp file for the message of the next commit
 *.tmp
+
+# ignore ipynb test file
+/test
+*.ipynb

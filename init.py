@@ -53,10 +53,12 @@ if __name__ == '__main__':
             if aQ:
                 ic.setAncient(aQ)
         elif ictype == 'file':
-            if ns == 0:
-                ic = InitCond(ictype, t0)
-            else:
+            if ns != 0:
                 ic = InitCond(ictype, t0, (ns, dns))
+            elif nsMax != 0:
+                ic = InitCond(ictype, t0, (nsMax))
+            else:
+                ic = InitCond(ictype, t0)
             ic.setFile(dirres + fname)
             ic.set_shiftQ(shiftQ)
         C = Kernel(g=g, ob=ob, dr=dr)
