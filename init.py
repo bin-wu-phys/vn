@@ -56,7 +56,7 @@ if __name__ == '__main__':
             if ns != 0:
                 ic = InitCond(ictype, t0, (ns, dns))
             elif nsMax != 0:
-                ic = InitCond(ictype, t0, (nsMax))
+                ic = InitCond(ictype, t0, (nsMax,))
             else:
                 ic = InitCond(ictype, t0)
             ic.setFile(dirres + fname)

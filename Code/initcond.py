@@ -320,15 +320,15 @@ class InitCond:
         """
         F0 = self.fft(self.from_file_theta, latt)
         if len(self.dn) == 1:
-            if len(self.dn[0]) == 1:
-                for n in range(dn[0][0] + 1, len(F0)):
-                    F0[n, :, :, :] = 0.0*F0[n, :, :, :]
-            elif len(self.dn[0]) == 2:
+            if len(self.dn[0]) == 2: # n-perturbation has the priority.
                 for n in range(1, len(F0)):
                     if n == self.dn[0][0]:
                         F0[n, :, :, :] = self.dn[0][1]*F0[n, :, :, :]
                     else:
                         F0[n, :, :, :] = 0.0*F0[n, :, :, :]
+            elif len(self.dn[0]) == 1:
+                for n in range(self.dn[0][0] + 1, len(F0)):
+                    F0[n, :, :, :] = 0.0 * F0[n, :, :, :]
         return F0
 
     lookup = {'gaussian': gauss, 'hocky puck': hockypuck, ' Woods-Saxo':ws, 'file':from_file}
