@@ -36,6 +36,7 @@ if len(sys.argv) == 2:
             err : the maximum error used for adaptive time step
             d1, d2, d3, d4, d5, d6, g : the perturbation for nth harmonica and \hat{gamma}
             p1, p2, p3, p4, p5, p6: the nth reaction plane angle in radian
+            ln: the radial wavenumber corresponding to n
             aQ : aQ=True, False for old, new initial gaussian condition
             rMax, nr, vMax, nv, nph, nth : parameters for setting up the lattice
             procs: the number of processes for parallel computation
@@ -75,6 +76,14 @@ psi3d = 0.0
 psi4d = 0.0
 psi5d = 0.0
 psi6d = 0.0
+
+#by default all the radial wavenumbers are zero, which means using our default radial profile
+l1 = 0
+l2 = 0
+l3 = 0
+l4 = 0
+l5 = 0
+l6 = 0
 
 adtQ = True
 shiftQ = True
@@ -159,6 +168,18 @@ for para in argvs:
         psi5 = float(cmd[1])
     elif cmd[0] == 'p6':
         psi6 = float(cmd[1])
+    elif cmd[0] == 'l1':
+        l1 = int(cmd[1])
+    elif cmd[0] == 'l2':
+        l2 = int(cmd[1])
+    elif cmd[0] == 'l3':
+        l3 = int(cmd[1])
+    elif cmd[0] == 'l4':
+        l4 = int(cmd[1])
+    elif cmd[0] == 'l5':
+        l5 = int(cmd[1])
+    elif cmd[0] == 'l6':
+        l6 = int(cmd[1])
     elif cmd[0] == 'ns':
         ns = int(cmd[1])
     elif cmd[0] == 'dns':
@@ -227,7 +248,7 @@ if ictype == icd:
     if folder == '':
         fn = 't0.{:.2f}.d1.{:.2f}.d2.{:.2f}.d3.{:.2f}.d4.{:.2f}.d5.{:.2f}.d6.{:.2f}.g.{:.2f}.nth.{}'.format(
                                                     t0, d1, delta, delta3, d4, d5, d6, g, nth, vMax, nv)
-
+        # the ratational angle
         if psi1 != psi1d:
             fn = fn + '.p1.{:.1f}'.format(psi1)
         if psi2 != psi2d:
@@ -240,6 +261,21 @@ if ictype == icd:
             fn = fn + '.p5.{:.1f}'.format(psi5)
         if psi6 != psi6d:
             fn = fn + '.p6.{:.1f}'.format(psi6)
+
+        # add the radial wavenumber
+        if l1 != 0:
+            fn = fn + '.l1.{}'.format(l1)
+        if l2 != 0:
+            fn = fn + '.l2.{}'.format(l2)
+        if l3 != 0:
+            fn = fn + '.l3.{}'.format(l3)
+        if l4 != 0:
+            fn = fn + '.l4.{}'.format(l4)
+        if l5 != 0:
+            fn = fn + '.l5.{}'.format(l5)
+        if l6 != 0:
+            fn = fn + '.l6.{}'.format(l6)
+
         if vMax != vMaxd or nv != nvd:
             fn = fn + f'.vMax.{vMax}.nv.{nv}'
         if rMax != rMaxd or nr != nrd:
@@ -281,6 +317,11 @@ if ictype == icd:
             psi5 = float(decode(folder, '.p5.'))
         if '.p6.' in folder:
             psi6 = float(decode(folder, '.p6.'))
+
+        for nl in range(1, 7):
+            if 'l{}'.format(nl) in folder:
+                exec("l{} = int(decode(folder, '.l{}.'))".format(nl, nl))
+
         if '.vMax.' in folder:
             vMax = float(decode(folder, '.vMax.'))
         if '.nv.' in folder:

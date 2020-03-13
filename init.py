@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 import sys
-work_path = '/afs/cern.ch/user/b/biwu/vn/version8'
+work_path = '/afs/cern.ch/user/b/biwu/vn/version8.2'
 sys.path.insert(0, work_path)
 
 if __name__ == '__main__':
@@ -47,9 +47,9 @@ if __name__ == '__main__':
 
         ob = Observable(t0, latt)
         if ictype == 'gaussian':
-            ic = InitCond(ictype, t0, (1, d1, psi1*np.pi/180.0), (2, delta, psi2*np.pi/180.0),
-                                    (3, delta3, psi3*np.pi/180.0), (4, d4, psi4*np.pi/180.0),
-                                    (5, d5, psi5*np.pi/180.0), (6, d6, psi6*np.pi/180.0))
+            ic = InitCond(ictype, t0, (1, d1, psi1*np.pi/180.0, l1), (2, delta, psi2*np.pi/180.0, l2),
+                                    (3, delta3, psi3*np.pi/180.0, l3), (4, d4, psi4*np.pi/180.0, l4),
+                                    (5, d5, psi5*np.pi/180.0, l5), (6, d6, psi6*np.pi/180.0, l6))
             if aQ:
                 ic.setAncient(aQ)
         elif ictype == 'file':
