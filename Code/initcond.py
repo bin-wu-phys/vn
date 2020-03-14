@@ -50,7 +50,7 @@ class InitCond:
         """
         rho = np.sqrt(1.0 - np.exp(-r2))
 
-        return jv(n, jn_zeros(n, l)[0]*rho)/self.t0
+        return jv(n, jn_zeros(n, l)[-1]*rho)/self.t0
 
 
     def FTn(self, r, phir):
