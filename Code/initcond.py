@@ -9,6 +9,7 @@ Created on Wed Jun 12 10:46:10 2019
 import numpy as np
 #import lattice
 from scipy import interpolate, integrate
+from scipy.special import jv, jn_zeros
 
 
 class InitCond:
@@ -38,6 +39,19 @@ class InitCond:
         The background transverse profile.
         """
         return 2.0*np.exp(-r**2-self.t0**2+2.0*r*self.t0*np.cos(phir))/self.t0
+
+    def J(self, n, l, r2):
+        """
+        Bessel-Gaussian parametrization of the radial profile.
+        n : nth theta harmonic
+        l: lth radial wavenumber
+        r2: r^2
+        :return: lth radial wavenumber of the nth theta harmonic.
+        """
+        rho = np.sqrt(1.0 - np.exp(-r2))
+
+        return jv(n, jn_zeros(n, l)*rho)/self.t0
+
 
     def FTn(self, r, phir):
         res = np.ndarray(len(self.dn), dtype=np.complex)
@@ -133,6 +147,118 @@ class InitCond:
                     """
                     # print(81.0*np.sqrt(np.pi)/64.0)
                     res[n] = res[n] * 729.0 * np.exp(-0.5 * r2) / 2560.0
+        return res
+
+    def FTn_spatial(self, r, phir):
+        res = np.ndarray(len(self.dn), dtype=np.complex)
+        r2 = (r**2+self.t0**2-2.0*r*self.t0*np.cos(phir))
+        for n in range(len(self.dn)):
+            phase = np.exp(-1.0j*self.dn[n][0]*self.dn[n][2])
+            if self.dn[n][0] == 1:
+                res[n] = 0.5*phase*(r - self.t0*np.cos(phir)
+                        - 1.0j*self.t0*np.sin(phir))
+                if not self.ancientQ:
+                    """
+                    max e_1 = 0.413418
+                    """
+                    #d_2 = 3.375*epsilon_2
+                    if self.dn[n][3] == 0:
+                        res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
+            elif self.dn[n][0] == 2:
+                res[n] = 0.5*phase*(r*r - 2.0*r*self.t0*np.cos(phir)
+                        + self.t0*self.t0*np.cos(2.0*phir) - 2.0j*self.t0*(r
+                        - self.t0*np.cos(phir))*np.sin(phir))
+                if not self.ancientQ:
+                    #d_2 = 3.375*epsilon_2
+                    if self.dn[n][3] == 0:
+                        res[n] = 3.375*res[n]*np.exp(-0.5*r2)
+            elif self.dn[n][0] == 3:
+                res[n] = 0.5*phase*(r**3 - 3.0*r*r*self.t0*np.cos(phir)
+                        + 3.0*r*(self.t0**2)*np.cos(2.0*phir)
+                        - (self.t0**3)*np.cos(3.0*phir) - 1.0j*self.t0*(
+                        3.0*(r**2)*np.sin(phir)- 3.0*self.t0*r*np.sin(
+                        2.0*phir) + (self.t0**2)*np.sin(3.0*phir)))
+                if not self.ancientQ:
+                    """
+                    the maximum e_3 has a value smaller than 0.38.
+                    """
+                    # print(81.0*np.sqrt(np.pi)/64.0)
+                    if self.dn[n][3] == 0:
+                        res[n] = res[n]*81.0*np.sqrt(np.pi)*np.exp(-0.5*r2)/64.0
+            elif self.dn[n][0] == 4:
+                res[n] = 0.5 *phase*(r ** 4 - 4.0 * (r**3) * self.t0 * np.cos(phir)
+                                + 6.0 * (r**2) * (self.t0 ** 2) * np.cos(2.0 * phir)
+                                - 4.0*r*(self.t0**3)*np.cos(3.0*phir)
+                                + (self.t0 ** 4) * np.cos(4.0 * phir)
+                                - 1.0j * self.t0 * (
+                                                    4.0 * (r ** 3) * np.sin(phir)
+                                                    - 6.0 * self.t0 * (r**2) * np.sin(2.0 * phir)
+                                                    + 4.0*r*(self.t0 ** 2) * np.sin(3.0 * phir)
+                                                    - (self.t0**3)*np.sin(4.0*phir)
+                                                    )
+                                )
+                if not self.ancientQ:
+                    """
+                    the maximum e_4 has a value smaller than 0.36.
+                    """
+                    # print(81.0*np.sqrt(np.pi)/64.0)
+                    if self.dn[n][3] == 0:
+                        res[n] = 81.0*res[n] * np.exp(-0.5 * r2)/64.0
+            elif self.dn[n][0] == 5:
+                res[n] = 0.5 *phase*(r ** 5 - 5.0 * (r**4) * self.t0 * np.cos(phir)
+                                + 10.0 * (r**3) * (self.t0 ** 2) * np.cos(2.0 * phir)
+                                - 10.0*(r**2)*(self.t0 ** 3) * np.cos(3.0 * phir)
+                                + 5.0*r*(self.t0**4)*np.cos(4.0*phir)
+                                - (self.t0**5)*np.cos(5.0*phir)
+                                - 1.0j * self.t0 * (
+                                                    5.0 * (r ** 4)* np.sin(phir)
+                                                    - 10.0 * self.t0 * (r**3) * np.sin(2.0 * phir)
+                                                    + 10.0*(r**2)*(self.t0 ** 2) * np.sin(3.0 * phir)
+                                                    - 5.0*r*(self.t0**3)*np.sin(4.0*phir)
+                                                    + (self.t0**4)*np.sin(5.0*phir)
+                                                    )
+                                )
+                if not self.ancientQ:
+                    """
+                    the maximum e_5 has a value smaller than 0.345.
+                    """
+                    # print(81.0*np.sqrt(np.pi)/64.0)
+                    if self.dn[n][3] == 0:
+                        res[n] = res[n] * 729.0 * np.sqrt(np.pi) * np.exp(-0.5 * r2) / 2048.0
+            elif self.dn[n][0] == 6:
+                res[n] = 0.5 * phase * (r ** 6
+                                        - 6.0 * (r ** 5) * self.t0 * np.cos(phir)
+                                        + 15.0 * (r ** 4) * (self.t0 ** 2) * np.cos(2.0 * phir)
+                                        - 20.0 * (r ** 3) * (self.t0 ** 3) * np.cos(3.0 * phir)
+                                        + 15.0 * (r**2) * (self.t0 ** 4) * np.cos(4.0 * phir)
+                                        - 6.0*r*(self.t0 ** 5) * np.cos(5.0 * phir)
+                                        + (self.t0**6)*np.cos(6.0 * phir)
+                                        - 1.0j * self.t0 * (
+                                                6.0 * (r ** 5) * np.sin(phir)
+                                                - 15.0 * self.t0 * (r ** 4) * np.sin(2.0 * phir)
+                                                + 20.0 * (self.t0**2)*(r ** 3) * np.sin(3.0 * phir)
+                                                - 15.0 * (self.t0**3)*(r**2)  * np.sin(4.0 * phir)
+                                                + 6.0*(self.t0 ** 4)*r * np.sin(5.0 * phir)
+                                                - (self.t0 ** 5) * np.sin(6.0 * phir)
+                                                )
+                                        )
+                if not self.ancientQ:
+                    """
+                    the maximum e_6 has a value smaller than 0.326544.
+                    """
+                    # print(81.0*np.sqrt(np.pi)/64.0)
+                    if self.dn[n][3] == 0:
+                        res[n] = res[n] * 729.0 * np.exp(-0.5 * r2) / 2560.0
+
+            # Spatial profile
+            if self.dn[n][3] == 0:
+                """
+                Here, we put in the background such that it is the transverse profile just as the case self.dn[n][3] >0.
+                """
+                res[n] = res[n]*self.Fbg(r, phir)
+            else:
+                res[n] = self.J(self.dn[n][0], self.dn[n][3], r2)*res[n] / np.sqrt(r2)**self.dn[n][0]
+
         return res
 
     def Fn(self, theta, r, phir):
@@ -237,13 +363,13 @@ class InitCond:
                 F0[0][vz][r][phi] = len(latt.lattice[self.theta])*self.Fbg(
                         latt.lattice[self.r][r], latt.lattice[self.phi][phi]
                         )/(latt.lattice[self.vz][1])
-                fn = self.FTn(latt.lattice[self.r][r],
+                fn = self.FTn_spatial(latt.lattice[self.r][r],
                               latt.lattice[self.phi][phi])
                 for n in range(len(self.dn)):
                     #print(n, self.dn[n][0], self.dn[n][1])
                     F0[self.dn[n][0]][vz][r][phi] = np.exp(
                     -1.0j*self.dn[n][0]*latt.lattice[self.phi][phi]
-                    )*self.dn[n][1]*fn[n]*F0[0][vz][r][phi]
+                    )*self.dn[n][1]*fn[n]*len(latt.lattice[self.theta])/(latt.lattice[self.vz][1])
 
         return F0
 
