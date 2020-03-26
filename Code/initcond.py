@@ -386,7 +386,18 @@ class InitCond:
         """
         self.shiftQ = s
 
-    def read(self):
+    def smoother(self, r2):
+        """
+        Smooth function.
+        :param r2: a float or np.array, radial coordinate squaired
+        :return: a float or np.array
+        """
+        return np.exp(-0.5*r2/self.R_smooth2)/(2.0*np.pi*self.R_smooth2)
+
+    def read_density(self):
+        """
+        Read out transverse energy from fname.
+        """
         f = open(self.fname)
         data = [l.replace('\n', '').split(' ') for l in f if ('#' not in l) and (l != '')]
         density = np.array([[float(d) for d in l] for l in data])
@@ -394,7 +405,31 @@ class InitCond:
         xList = [-xMax + 0.5 * dx + n * dx for n in range(int(2.0 * xMax / dx))]
         yMax, dy = 10.0, 0.2
         yList = [-yMax + 0.5 * dy + n * dy for n in range(int(2.0 * yMax / dy))]
-        self.init_fun = interpolate.interp2d(xList, yList, density, kind='linear', fill_value=0.0)
+
+        if self.smoothQ:
+            density = dx*dx*np.array(
+                        [[ np.sum(
+                            [[  density[ixp, iyp]*self.smoother(
+                                    (xList[ix] - xList[ixp])**2 + (yList[iy] - yList[iyp])**2
+                                )
+                                for iyp in range(len(yList))
+                            ]
+                             for ixp in range(len(xList))]
+                        )
+                            for iy in range(len(yList))
+                        ]
+                        for ix in range(len(xList))
+                        ]
+                        )
+        return density
+
+    def read(self):
+        """
+        Read out transverse energy from fname.
+        """
+
+        self.init_fun = interpolate.interp2d(xList, yList, read_density(), kind='linear', fill_value=0.0)
+
         #print('Calculating N ...\n')
         N = integrate.nquad(lambda x, y: self.init_fun(x, y)[0], [(-9.9, 9.9), (-9.9, 9.9)])
         if self.shiftQ:
@@ -461,15 +496,33 @@ class InitCond:
 
     def __init__(self, ICtype, t0=0.1, *harmonics):
         """
-        The initial condition is given by the theta harmonics and 
-        the transverse profile. For simplicity, we firs assume 
-        the transverse profile is the same for all the harmonics.
+        InitCond()
+
+        A InitCond object evalute the initial condition for a KinTran object.
+
+        Parameters
+        ----------
+        t0 : float
+            The initial time.
+
+        Attributes
+        ----------
+        smoothQ : bool
+            If true, a guassian smooth will apply to the initial transverse profile in coordinate space.
+        fname : basestring
+            Filename for the initial transverse energy. It is only constrained to Farid's file style.
+        R_smooths : float
+            the radius squared for the smooth function: smoother
+        init_fun : smoothed initial energy density if smoothQ is True. It is, otherwise, the same as input_fun.
         """
         self.ancientQ = False
-        self.fname = None
-        self.init_fun = None
 
         #parameters for input initial profile
+        self.fname = None
+        self.smoothQ = False
+        self.R_smooth2 = 1.0
+        self.init_fun = None
+
         self.xb = 0.0 # average value of x
         self.yb = 0.0 # average value of y
         self.R = 1.0 # the root mean square radius
@@ -504,3 +557,15 @@ class InitCond:
     def setFile(self, fn):
         self.fname = fn
 
+    def setSmooth(self, sQ):
+        """
+        evaluate self.smoothQ
+        :param sQ: bool
+        """
+        self.smoothQ = sQ
+
+    def setR_smooth(self, Rs):
+        """
+        :param Rs: float, smearing radius
+        """
+        self.R_smooth2 = Rs**2
