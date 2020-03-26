@@ -421,14 +421,15 @@ class InitCond:
                         for ix in range(len(xList))
                         ]
                         )
+        self.init_fun = interpolate.interp2d(xList, yList, density, kind='linear', fill_value=0.0)
+
         return density
 
     def read(self):
         """
         Read out transverse energy from fname.
         """
-
-        self.init_fun = interpolate.interp2d(xList, yList, read_density(), kind='linear', fill_value=0.0)
+        self.read_density()
 
         #print('Calculating N ...\n')
         N = integrate.nquad(lambda x, y: self.init_fun(x, y)[0], [(-9.9, 9.9), (-9.9, 9.9)])
