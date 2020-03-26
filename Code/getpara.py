@@ -51,7 +51,11 @@ if len(sys.argv) == 2:
                 switch on one modes ns=(some integer) and specify the amplitude dns=(some value).\
             nsMax : int
                 switch off all the harmonic modes larger than nsMax.
-            Here, if both (ns, dns) and nsMax are given, (ns, dns) has the priority.
+            Here, if both (ns, dns) and nsMax are given, (ns, dns) has the priority.    
+            smoothQ : bool
+                switch on smooth function with R_smooth.
+            Rs : float
+                the smearing radius (R_smooth) for the smooth function
             """
         )
         quit()
@@ -63,6 +67,8 @@ nrd = 31 # n_r
 vMaxd = 10.0 # v_max
 nvd = 21 # n_v
 procs = 6 # number of processors used
+R_smooth = 0.5 # smearing radius
+smoothQ = False
 
 
 icd = 'gaussian'
@@ -206,6 +212,14 @@ for para in argvs:
         else:
             print("adtQ can only be True or False.")
             exit()
+    elif cmd[0] == 'smoothQ':
+        if cmd[1] == 'True':
+            smoothQ = True
+        elif cmd[1] == 'False':
+            smoothQ = False
+        else:
+            print("smoothQ can only be True or False.")
+            exit()
     elif cmd[0] == 'shiftQ':
         if cmd[1] == 'True':
             shiftQ = True
@@ -222,6 +236,8 @@ for para in argvs:
         dr = float(cmd[1])
     elif cmd[0] == 'tMax':
         tMax = float(cmd[1])
+    elif cmd[0] == 'Rs':
+        R_smooth = float(cmd[1])
     elif cmd[0] == 'rMax':
         rMax = float(cmd[1])
     elif cmd[0] == 'nr':
@@ -356,4 +372,7 @@ elif ictype == 'file':
     else:
         fn = fn + '.unshifted'
 
+    if smoothQ:
+        fn = fn + '.smoothed'
+        fn = fn + '.Rs.{:.2f}'.format(R_smooth)
 print(fn)

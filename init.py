@@ -61,6 +61,9 @@ if __name__ == '__main__':
                 ic = InitCond(ictype, t0)
             ic.setFile(dirres + fname)
             ic.set_shiftQ(shiftQ)
+            if smoothQ:
+                ic.setSmooth(smoothQ)
+                ic.setR_smooth(R_smooth)
         C = Kernel(g=g, ob=ob, dr=dr)
         kt = KinTran(t0, ic.initialize(latt), C, dt=dt, err=err)
         if procs > 1:
