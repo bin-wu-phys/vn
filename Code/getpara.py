@@ -366,6 +366,8 @@ elif ictype == 'file':
             fn = fn + '.dos.{:.2f}'.format(dos)
     elif nsMax != 0:
         fn = fn + '.nsMax.{}'.format(nsMax)
+        if dos != 0.0:
+            fn = fn + '.dos.{:.2f}'.format(dos)
     if vMax != vMaxd or nv != nvd:
         fn = fn + f'.vMax.{vMax}.nv.{nv}'
     if rMax != rMaxd or nr != nrd:

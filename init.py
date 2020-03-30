@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 import sys
-work_path = '/afs/cern.ch/user/b/biwu/vn/version9'
+work_path = '/afs/cern.ch/user/b/biwu/vn/version9.2'
 sys.path.insert(0, work_path)
 
 if __name__ == '__main__':
@@ -56,9 +56,11 @@ if __name__ == '__main__':
             if ns != 0:
                 ic = InitCond(ictype, t0, (ns, dns))
                 if dos != 0.0:
-                    ic.set_delta_of_other_modes(dos)
+                    ic.set_dos(dos)
             elif nsMax != 0:
                 ic = InitCond(ictype, t0, (nsMax,))
+                if dos != 0.0:
+                    ic.set_dos(dos)
             else:
                 ic = InitCond(ictype, t0)
             ic.setFile(dirres + fname)
