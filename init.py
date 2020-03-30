@@ -55,6 +55,8 @@ if __name__ == '__main__':
         elif ictype == 'file':
             if ns != 0:
                 ic = InitCond(ictype, t0, (ns, dns))
+                if dos != 0.0:
+                    ic.set_delta_of_other_modes(dos)
             elif nsMax != 0:
                 ic = InitCond(ictype, t0, (nsMax,))
             else:

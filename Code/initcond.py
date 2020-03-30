@@ -487,10 +487,10 @@ class InitCond:
                     if n == self.dn[0][0]:
                         F0[n, :, :, :] = self.dn[0][1]*F0[n, :, :, :]
                     else:
-                        F0[n, :, :, :] = 0.0*F0[n, :, :, :]
+                        F0[n, :, :, :] = self.dos*F0[n, :, :, :]
             elif len(self.dn[0]) == 1:
                 for n in range(self.dn[0][0] + 1, len(F0)):
-                    F0[n, :, :, :] = 0.0 * F0[n, :, :, :]
+                    F0[n, :, :, :] = self.dos * F0[n, :, :, :]
         return F0
 
     lookup = {'gaussian': gauss, 'hocky puck': hockypuck, ' Woods-Saxo':ws, 'file':from_file}
@@ -505,7 +505,8 @@ class InitCond:
         ----------
         t0 : float
             The initial time.
-
+        dos: float
+            The amplitude (delta) of other modes.
         Attributes
         ----------
         smoothQ : bool
@@ -520,6 +521,7 @@ class InitCond:
 
         #parameters for input initial profile
         self.fname = None
+        self.dos = 0.0
         self.smoothQ = False
         self.R_smooth2 = 1.0
         self.init_fun = None
@@ -570,3 +572,10 @@ class InitCond:
         :param Rs: float, smearing radius
         """
         self.R_smooth2 = Rs**2
+
+    def set_dos(self, dos):
+        """
+        Set the maplitude for the other modes.
+        :param dos: float
+        """
+        self.dos = dos

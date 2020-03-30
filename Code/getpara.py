@@ -47,8 +47,9 @@ if len(sys.argv) == 2:
             It also takes the input file and runs like:
             "./init.py ic=file fn=file name para=value"
             Here, one can:
-            ns, dns : integer, float
-                switch on one modes ns=(some integer) and specify the amplitude dns=(some value).\
+            ns, dns, dos: integer, float, float
+                switch on one modes ns=(some integer) and specify the amplitude dns=(some value)
+                and the amplitude for other modes dos=(some value), zero by default.
             nsMax : int
                 switch off all the harmonic modes larger than nsMax.
             Here, if both (ns, dns) and nsMax are given, (ns, dns) has the priority.    
@@ -126,6 +127,7 @@ psi6 = 0.0
 #initial condition from file, switch on one mode
 ns = 0
 dns = 1.0
+dos = 0.0
 nsMax = 0
 
 # Read the parameters
@@ -190,6 +192,8 @@ for para in argvs:
         ns = int(cmd[1])
     elif cmd[0] == 'dns':
         dns = float(cmd[1])
+    elif cmd[0] == 'dos':
+        dos = float(cmd[1])
     elif cmd[0] == 'nsMax':
         nsMax = int(cmd[1])
     elif cmd[0] == 'ic':
@@ -358,6 +362,8 @@ elif ictype == 'file':
     fn = 't0.{:.2f}.fn.{}.g.{:.2f}.nth.{}'.format(t0, fname[:-4], g, nth, vMax, nv)
     if ns != 0:
         fn = fn + '.ns.{}.dns.{:.2f}'.format(ns, dns)
+        if dos !=0.0:
+            fn = fn + '.dos.{:.2f}'.format(dos)
     elif nsMax != 0:
         fn = fn + '.nsMax.{}'.format(nsMax)
     if vMax != vMaxd or nv != nvd:
