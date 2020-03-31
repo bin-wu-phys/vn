@@ -173,8 +173,9 @@ if __name__ == '__main__':
                 kt.nextTimeTo(ts)
             vn.append(kt.kern.ob.calcvn(kt.t, kt.F))
             np.savez_compressed(fnamevn, vn=np.array(vn))
-            filename = dirres + fn + '/' + fn + '.t.{:.2f}.kt'.format(kt.t)
-            kt.save(filename)
+            if outputFQ:
+                filename = dirres + fn + '/' + fn + '.t.{:.2f}.kt'.format(kt.t)
+                kt.save(filename)
             cmptime = timeit.default_timer() - start
             f = open(finfo, 'a')
             f.write('For t0 = {:.2f} to t = {:.2f}, it takes {:.0f} hours {:.0f} minutes {:.2f} seconds.\n'.format(

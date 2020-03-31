@@ -57,11 +57,15 @@ if len(sys.argv) == 2:
                 switch on smooth function with R_smooth.
             Rs : float
                 the smearing radius (R_smooth) for the smooth function
+                
+            One can also decides on whether to output F by using outputF=True or False.
             """
         )
         quit()
 
 #default values
+outputFQ = True
+
 nphd = 40 # n_phi
 rMaxd = 3.0 # r_max
 nrd = 31 # n_r
@@ -231,6 +235,14 @@ for para in argvs:
             shiftQ = False
         else:
             print("shiftQ can only be True or False.")
+            exit()
+    elif cmd[0] == 'outputFQ':
+        if cmd[1] == 'True':
+            outputFQ = True
+        elif cmd[1] == 'False':
+            outputFQ = False
+        else:
+            print("outputFQ can only be True or False.")
             exit()
     elif cmd[0] == 't0':
         t0 = float(cmd[1])
