@@ -57,6 +57,8 @@ if len(sys.argv) == 2:
                 switch on smooth function with R_smooth.
             Rs : float
                 the smearing radius (R_smooth) for the smooth function
+            continuumQ, nthc : bool, int
+                If confinuumQ = True, populate the initial F calculated with a large number of nth = nthc.
                 
             One can also decides on whether to output F by using outputF=True or False.
             """
@@ -74,7 +76,8 @@ nvd = 21 # n_v
 procs = 6 # number of processors used
 R_smooth = 0.5 # smearing radius
 smoothQ = False
-
+nthc = 60
+continuumQ = False
 
 icd = 'gaussian'
 ictype=icd
@@ -244,6 +247,14 @@ for para in argvs:
         else:
             print("outputFQ can only be True or False.")
             exit()
+    elif cmd[0] == 'continuumQ':
+        if cmd[1] == 'True':
+            continuumQ = True
+        elif cmd[1] == 'False':
+            continuumQ = False
+        else:
+            print("continuumQ can only be True or False.")
+            exit()
     elif cmd[0] == 't0':
         t0 = float(cmd[1])
     elif cmd[0] == 'dt':
@@ -371,7 +382,9 @@ if ictype == icd:
         fn = folder
 
 elif ictype == 'file':
-    fn = 't0.{:.2f}.fn.{}.g.{:.2f}.nth.{}'.format(t0, fname[:-4], g, nth, vMax, nv)
+    fn = 't0.{:.2f}.fn.{}.g.{:.2f}.nth.{}'.format(t0, fname[:-4], g, nth)
+    if continuumQ:
+        fn = fn + f'.nthc.{nthc}'
     if ns != 0:
         fn = fn + '.ns.{}.dns.{:.2f}'.format(ns, dns)
         if dos !=0.0:
