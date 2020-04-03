@@ -417,4 +417,8 @@ elif ictype == 'file':
     if smoothQ:
         fn = fn + '.smoothed'
         fn = fn + '.Rs.{:.2f}'.format(R_smooth)
+
+    if len(switchboard) > 0:
+        fn = fn + '.sb.' + switchboard
+        
 print(fn)
