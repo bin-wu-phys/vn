@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 import sys
-work_path = '/afs/cern.ch/user/b/biwu/vn/version9.4'
+work_path = '/afs/cern.ch/user/b/biwu/vn/version9.5'
 sys.path.insert(0, work_path)
 
 if __name__ == '__main__':
@@ -78,9 +78,19 @@ if __name__ == '__main__':
             F_init[-1] = 0.0*F_init[-1]
             F_init = nth*F_init/nthc
 
-            kt = KinTran(t0, F_init, C, dt=dt, err=err)
+            #kt = KinTran(t0, F_init, C, dt=dt, err=err)
         else:
-            kt = KinTran(t0, ic.initialize(latt), C, dt=dt, err=err)
+            F_init = ic.initialize(latt)
+            #kt = KinTran(t0, ic.initialize(latt), C, dt=dt, err=err)
+
+        #Switch off modes accroding to the switchboard
+        if len(switchboard) > 0:
+            for idx_n in range(len(F_init)):
+                if str(idx_n) not in switchboard:
+                    F_init[idx_n] = 0.0*F_init[idx_n]
+
+        kt = KinTran(t0, F_init, C, dt=dt, err=err)
+
         if procs > 1:
             kt.kern.ob.setProcs(procs)
         if not adtQ:

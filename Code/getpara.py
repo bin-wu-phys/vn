@@ -59,6 +59,8 @@ if len(sys.argv) == 2:
                 the smearing radius (R_smooth) for the smooth function
             continuumQ, nthc : bool, int
                 If confinuumQ = True, populate the initial F calculated with a large number of nth = nthc.
+            switchboard : a string of integers
+                Each digits tells us which fourier mode is kept.
                 
             One can also decides on whether to output F by using outputF=True or False.
             """
@@ -78,6 +80,8 @@ R_smooth = 0.5 # smearing radius
 smoothQ = False
 nthc = 60
 continuumQ = False
+
+switchboard = ''#is empty by default.
 
 icd = 'gaussian'
 ictype=icd
@@ -207,6 +211,11 @@ for para in argvs:
         ictype = cmd[1]
     elif cmd[0] == 'fn':
         fname = cmd[1]
+    elif cmd[0] == 'switchboard':
+        switchboard = cmd[1]
+        if not switchboard.isalnum():
+            print('switchboard has to be numeric.')
+            exit()
     elif cmd[0] == 'aQ':
         if cmd[1] == 'True':
             aQ = True
