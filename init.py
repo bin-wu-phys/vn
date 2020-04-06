@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 if str(idx_n) not in switchboard:
                     F_init[idx_n] = 0.0*F_init[idx_n]
                 elif len(switchboard_amps) > 0:
-                    F_init[idx_n] = float(switchboard_amps[idx_n]) * F_init[idx_n]
+                    F_init[idx_n] = float(switchboard_amps[switchboard.find(str(idx_n))]) * F_init[idx_n]
 
         kt = KinTran(t0, F_init, C, dt=dt, err=err)
 
