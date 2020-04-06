@@ -2,7 +2,7 @@
 #!/usr/bin/env python3
 
 import sys
-work_path = '/afs/cern.ch/user/b/biwu/vn/version9.5'
+work_path = '/afs/cern.ch/user/b/biwu/vn/version9.6'
 sys.path.insert(0, work_path)
 
 if __name__ == '__main__':
@@ -88,6 +88,8 @@ if __name__ == '__main__':
             for idx_n in range(1, len(F_init)):
                 if str(idx_n) not in switchboard:
                     F_init[idx_n] = 0.0*F_init[idx_n]
+                elif len(switchboard_amps) > 0:
+                    F_init[idx_n] = float(switchboard_amps[idx_n]) * F_init[idx_n]
 
         kt = KinTran(t0, F_init, C, dt=dt, err=err)
 

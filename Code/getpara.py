@@ -60,7 +60,9 @@ if len(sys.argv) == 2:
             continuumQ, nthc : bool, int
                 If confinuumQ = True, populate the initial F calculated with a large number of nth = nthc.
             switchboard : a string of integers
-                Each digits tells us which fourier mode is kept.
+                Each digit tells us which fourier mode is kept. Here, I totally rule out the possibility with n >9.
+            sba: switch board amplide is a string of floats separated by |
+                if not empty, each float gives the amplitude of the corresponding digit in switchboard.
                 
             One can also decides on whether to output F by using outputF=True or False.
             """
@@ -82,6 +84,7 @@ nthc = 60
 continuumQ = False
 
 switchboard = ''#is empty by default.
+switchboard_amps = ''
 
 icd = 'gaussian'
 ictype=icd
@@ -216,6 +219,8 @@ for para in argvs:
         if not switchboard.isalnum():
             print('switchboard has to be numeric.')
             exit()
+    elif cmd[0] == 'sba':
+        switchboard_amps = cmd[1].split('|')
     elif cmd[0] == 'aQ':
         if cmd[1] == 'True':
             aQ = True
@@ -293,6 +298,11 @@ for para in argvs:
     else:
         print("'{}' is not recognized. Please run './init.py -h' to look it up.".format(cmd[0]))
         exit()
+
+    if len(switchboard_amps) > 0:
+        if len(switchboard_amps) != len(switchboard):
+            print("If you want to provide the amplitudes for the switchboard, please provide enough!\n")
+            exit()
 
 # err=err/g
 
@@ -418,7 +428,11 @@ elif ictype == 'file':
         fn = fn + '.smoothed'
         fn = fn + '.Rs.{:.2f}'.format(R_smooth)
 
-    if len(switchboard) > 0:
-        fn = fn + '.sb.' + switchboard
+    if len(switchboard)  > 0:
+        if len(switchboard_amps) == 0:
+            fn = fn + '.sb.' + switchboard
+        else:
+            for idx_sb in range(len(switchboard)):
+                fn = fn + '.d' + switchboard[idx_sb] + '.' + switchboard_amps[idx_sb]
         
 print(fn)
