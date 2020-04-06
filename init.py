@@ -85,7 +85,7 @@ if __name__ == '__main__':
 
         #Switch off modes accroding to the switchboard
         if len(switchboard) > 0:
-            for idx_n in range(len(F_init)):
+            for idx_n in range(1, len(F_init)):
                 if str(idx_n) not in switchboard:
                     F_init[idx_n] = 0.0*F_init[idx_n]
 
