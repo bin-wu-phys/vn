@@ -210,7 +210,7 @@ class KinTran:
                             self.kern.ob.latt.lattice[self.kern.ob.idx_r][0],
                             self.kern.ob.latt.lattice[self.kern.ob.idx_r][-1],
                             ])
-        np.savez_compressed(filename, t=self.t, F=self.F, dt=self.dt,
+        np.savez_compressed(filename, t=self.t, F=self.F, dt=self.dt, err=self.err,
                             g=self.kern.g, dr=self.kern.dr, t0=self.kern.ob.t0,
                             lattdim=lattdim, lattlim=lattlim
                             )
@@ -244,6 +244,6 @@ class KinTran:
         self.kern = Kernel(ob=ob, g=1.0*loadkt['g'], dr=1.0*loadkt['dr'])
 
         #load kt data
-        self.t, self.F, self.dt= 1.0*loadkt['t'], loadkt['F'], 1.0*loadkt['dt']
+        self.t, self.F, self.dt, self.err= 1.0*loadkt['t'], loadkt['F'], 1.0*loadkt['dt'], 1.0*loadkt['err']
         
         ob.setTime(self.t)
