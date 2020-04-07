@@ -434,5 +434,12 @@ elif ictype == 'file':
         else:
             for idx_sb in range(len(switchboard)):
                 fn = fn + '.d' + switchboard[idx_sb] + '.' + switchboard_amps[idx_sb]
-        
+
+    if adtQ:
+        if err !=errd:
+            fn = fn + '.err.{:.4f}'.format(err)
+    else:
+        if dt != dtd:
+            fn = fn + '.dt.{:.4f}'.format(dt)
+
 print(fn)
