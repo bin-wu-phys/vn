@@ -244,6 +244,8 @@ class KinTran:
         self.kern = Kernel(ob=ob, g=1.0*loadkt['g'], dr=1.0*loadkt['dr'])
 
         #load kt data
-        self.t, self.F, self.dt, self.err= 1.0*loadkt['t'], loadkt['F'], 1.0*loadkt['dt'], 1.0*loadkt['err']
+        self.t, self.F, self.dt = 1.0*loadkt['t'], loadkt['F'], 1.0*loadkt['dt']
+        if 'err' in loadkt.files:
+            self.err = 1.0 * loadkt['err']
         
         ob.setTime(self.t)
