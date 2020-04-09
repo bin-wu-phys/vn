@@ -64,7 +64,7 @@ if len(sys.argv) == 2:
             sba: switch board amplide is a string of floats separated by |
                 if not empty, each float gives the amplitude of the corresponding digit in switchboard.
                 
-            One can also decides on whether to output F by using outputF=True or False.
+            One can also decides on whether to output F by using outputFQ=True or False.
             """
         )
         quit()
