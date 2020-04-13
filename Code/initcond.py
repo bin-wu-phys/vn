@@ -54,11 +54,13 @@ class InitCond:
         return jv(n, jn_zeros(n, l)[-1]*rho)*2.0*np.exp(-r2)/self.t0
 
     def FT1(self, r):
+        a = 14.742928210363173
+        b = 0.5460336386015008
         res = 0.0
         if r <= 1.0:
-            res = np.sin(np.pi*r)
+            res = np.sin(np.pi*r)*np.exp(r**2)
         elif r > 1.0:
-            res = - np.pi*(r-1.0)*np.exp(-np.pi**3*math.gamma(2.0/3.0)**1.5*(r - 1)**3/(3.0*np.sqrt(3.0)))/r
+            res = - a*(r-1.0)*np.exp(-b*r**2)/r**2
 
         return res
 
@@ -68,15 +70,14 @@ class InitCond:
         for n in range(len(self.dn)):
             phase = np.exp(-1.0j*self.dn[n][0]*self.dn[n][2])
             if self.dn[n][0] == 1:
-                # res[n] = 0.5*phase*(r - self.t0*np.cos(phir)
-                #         - 1.0j*self.t0*np.sin(phir))
-                # if not self.ancientQ:
-                #     """
-                #     max e_1 = 0.413418
-                #     """
-                #     #d_2 = 3.375*epsilon_2
-                #     res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
-                res[n] = 0.5 * phase *self.FT1(r)
+                res[n] = 0.5*phase*(r - self.t0*np.cos(phir)
+                        - 1.0j*self.t0*np.sin(phir))
+                if not self.ancientQ:
+                    """
+                    max e_1 = 0.413418
+                    """
+                    #d_2 = 3.375*epsilon_2
+                    res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
             elif self.dn[n][0] == 2:
                 res[n] = 0.5*phase*(r*r - 2.0*r*self.t0*np.cos(phir)
                         + self.t0*self.t0*np.cos(2.0*phir) - 2.0j*self.t0*(r
@@ -173,7 +174,8 @@ class InitCond:
                     """
                     #d_2 = 3.375*epsilon_2
                     if self.dn[n][3] == 0:
-                        res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
+                        #res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
+                        res[n] = res[n]*self.FT1(np.sqrt(r2))/np.sqrt(r2)
             elif self.dn[n][0] == 2:
                 res[n] = 0.5*phase*(r*r - 2.0*r*self.t0*np.cos(phir)
                         + self.t0*self.t0*np.cos(2.0*phir) - 2.0j*self.t0*(r
@@ -594,6 +596,7 @@ if __name__ == '__main__':
     ic = InitCond('gaussian')
 
     r = np.arange(0, 3.0, 0.1)
+    y = np.array([ic.FT1(x) for x in r])
     print(r)
-    print([ic.FT1(x) for x in r])
-    print(ic.FT1(1.5))
+    print(y)
+    print((r**2*y*np.exp(-r**2)).sum())
