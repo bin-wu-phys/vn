@@ -47,15 +47,19 @@ class ShowData:
                                             for t in range(len(vn))
                         ])
 
-    def e(self, n, comment=False):
+    def e(self, n, comment=False, check_origin_shifted=False):
         """
         Calculate en from the distribution function.
+        If check_origin_shifted == True, for n = 1, calculate <F_1>/<F_0> instead.
         """
         # Read F0 if necessary
         self.read_F0()
 
         if n == 1:
-            pn = 3
+            if check_origin_shifted:
+                pn = 2
+            else:
+                pn = 3
         else:
             pn = n + 1
 
