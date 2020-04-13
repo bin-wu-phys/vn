@@ -7,6 +7,7 @@ Created on Wed Jun 12 10:46:10 2019
 """
 
 import numpy as np
+import math
 #import lattice
 from scipy import interpolate, integrate
 from scipy.special import jv, jn_zeros
@@ -52,6 +53,14 @@ class InitCond:
 
         return jv(n, jn_zeros(n, l)[-1]*rho)*2.0*np.exp(-r2)/self.t0
 
+    def FT1(self, r):
+        res = 0.0
+        if r <= 1.0:
+            res = np.sin(np.pi*r)
+        elif r > 1.0:
+            res = - np.pi*(r-1.0)*np.exp(-np.pi**3*math.gamma(2.0/3.0)**1.5*(r - 1)**3/(3.0*np.sqrt(3.0)))/r
+
+        return res
 
     def FTn(self, r, phir):
         res = np.ndarray(len(self.dn), dtype=np.complex)
@@ -59,14 +68,15 @@ class InitCond:
         for n in range(len(self.dn)):
             phase = np.exp(-1.0j*self.dn[n][0]*self.dn[n][2])
             if self.dn[n][0] == 1:
-                res[n] = 0.5*phase*(r - self.t0*np.cos(phir)
-                        - 1.0j*self.t0*np.sin(phir))
-                if not self.ancientQ:
-                    """
-                    max e_1 = 0.413418
-                    """
-                    #d_2 = 3.375*epsilon_2
-                    res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
+                # res[n] = 0.5*phase*(r - self.t0*np.cos(phir)
+                #         - 1.0j*self.t0*np.sin(phir))
+                # if not self.ancientQ:
+                #     """
+                #     max e_1 = 0.413418
+                #     """
+                #     #d_2 = 3.375*epsilon_2
+                #     res[n] = 2.25*np.sqrt(np.pi)*res[n]*np.exp(-0.5*r2)
+                res[n] = 0.5 * phase *self.FT1(r)
             elif self.dn[n][0] == 2:
                 res[n] = 0.5*phase*(r*r - 2.0*r*self.t0*np.cos(phir)
                         + self.t0*self.t0*np.cos(2.0*phir) - 2.0j*self.t0*(r
@@ -579,3 +589,11 @@ class InitCond:
         :param dos: float
         """
         self.dos = dos
+
+if __name__ == '__main__':
+    ic = InitCond('gaussian')
+
+    r = np.arange(0, 3.0, 0.1)
+    print(r)
+    print([ic.FT1(x) for x in r])
+    print(ic.FT1(1.5))
